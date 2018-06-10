@@ -3,12 +3,14 @@ package programfirebase.comdasd.example.javad.progland;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -84,4 +86,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             linearLayout= (LinearLayout) itemView.findViewById(R.id.linerLayout);
         }
     }
+    public void updateList(List<ListItem> newList){
+        listItems = new ArrayList<>();
+        listItems.addAll(newList);
+        notifyDataSetChanged();
+    }
+
 }

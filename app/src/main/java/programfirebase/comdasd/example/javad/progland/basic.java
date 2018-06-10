@@ -3,13 +3,9 @@ package programfirebase.comdasd.example.javad.progland;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -33,9 +30,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.support.v7.widget.SearchView;
 
 public class basic extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private List<ListItem> listItems;
@@ -96,6 +94,9 @@ public class basic extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.basic, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener (this);
         return true;
     }
 
@@ -107,12 +108,14 @@ public class basic extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -174,6 +177,7 @@ public class basic extends AppCompatActivity
                                 );
                                 listItems.add(item);
                             }
+
                             adapter = new MyAdapter(listItems, getApplicationContext());
                             recyclerView.setAdapter(adapter);
 
@@ -196,5 +200,24 @@ public class basic extends AppCompatActivity
         requestQueue.add(stringRequest);
     }
     else {}
+    }
+
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        String userImput = newText.toLowerCase();
+        List<ListItem> newList = new ArrayList<>();
+
+        for(ListItem name : listItems){
+            newList.add(name);
+        }
+        adapter = new MyAdapter(newList, getApplicationContext());
+        recyclerView.setAdapter(adapter);
+        return true;
     }
 }

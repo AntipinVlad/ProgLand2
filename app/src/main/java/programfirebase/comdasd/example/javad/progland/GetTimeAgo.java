@@ -5,9 +5,6 @@ package programfirebase.comdasd.example.javad.progland;
  */
 import android.content.Context;
 
-/**
- * Created by SUDA on 16-10-2017.
- */
 
 public class GetTimeAgo {
     private static final int SECOND_MILLIS = 1000;

@@ -3,6 +3,7 @@ package programfirebase.comdasd.example.javad.progland;
 /**
  * Created by javad on 07.06.2018.
  */
+
 public class NoteModel {
 
     public String noteTitle;

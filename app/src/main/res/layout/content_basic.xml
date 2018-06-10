@@ -8,13 +8,13 @@
     tools:context="programfirebase.comdasd.example.javad.progland.basic"
     tools:showIn="@layout/app_bar_basic">
 
+
     <FrameLayout
         android:id="@+id/Frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
-
             android:id="@+id/recyclirView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

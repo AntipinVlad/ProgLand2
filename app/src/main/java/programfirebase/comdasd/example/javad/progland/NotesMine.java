@@ -51,89 +51,90 @@ public class NotesMine extends AppCompatActivity {
 
         mNotesList.setHasFixedSize(true);
         mNotesList.setLayoutManager(gridLayoutManager);
-      //  gridLayoutManager.setReverseLayout(true);
-      //  gridLayoutManager.setStackFromEnd(true);
+        //gridLayoutManager.setReverseLayout(true);
+        //gridLayoutManager.setStackFromEnd(true);
         mNotesList.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
 
         fAuth = FirebaseAuth.getInstance();
         if (fAuth.getCurrentUser() != null) {
             fNotesDatabase = FirebaseDatabase.getInstance().getReference().child("Notes").child(fAuth.getCurrentUser().getUid());
         }
+
+        updateUI();
+
+        loadData();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        adapter.startListening();
-
     }
 
 
-    private Query query = fNotesDatabase;
-    FirebaseRecyclerOptions<NoteModel> options =
-            new FirebaseRecyclerOptions.Builder<NoteModel>()
-                    .setQuery(query, NoteModel.class)
-                    //.setLifecycleOwner(NotesMine.this)
-                    .build();
+    private  void loadData() {
+        Query query = fNotesDatabase;
+        FirebaseRecyclerOptions<NoteModel> options =
+                new FirebaseRecyclerOptions.Builder<NoteModel>()
+                        .setQuery(query, NoteModel.class)
+                        .setLifecycleOwner(NotesMine.this)
+                        .build();
 
-    FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<NoteModel, NoteViewHolder>(options) {
-        @Override
-        public NoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.activity_notes, parent, false);
+        final FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<NoteModel, NoteViewHolder>(options) {
+            @Override
+            public NoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.activity_notes, parent, false);
 
-            return new NoteViewHolder(view);
-        }
+                return new NoteViewHolder(view);
+            }
 
-        @Override
-        protected void onBindViewHolder(final NoteViewHolder holder, int position, NoteModel model) {
-            final String noteId = getRef(position).getKey();
+            @Override
+            protected void onBindViewHolder(final NoteViewHolder holder, int position, NoteModel model) {
+                final String noteId = getRef(position).getKey();
 
-            fNotesDatabase.child(noteId).addValueEventListener(new ValueEventListener() {
+                fNotesDatabase.child(noteId).addValueEventListener(new ValueEventListener() {
 
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.hasChild("title") && dataSnapshot.hasChild("timestamp")) {
-                        String title = dataSnapshot.child("title").getValue().toString();
-                        String timestamp = dataSnapshot.child("timestamp").getValue().toString();
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild("title") && dataSnapshot.hasChild("timestamp")) {
+                            String title = dataSnapshot.child("title").getValue().toString();
+                            String timestamp = dataSnapshot.child("timestamp").getValue().toString();
 
-                        holder.setNoteTitle(title);
-                        holder.setNoteTime(timestamp);
+                            holder.setNoteTitle(title);
+                            // holder.setNoteTime(timestamp);
 
-                        GetTimeAgo getTimeAgo = new GetTimeAgo();
-                        holder.setNoteTime(getTimeAgo.getTimeAgo(Long.parseLong(timestamp), getApplicationContext()));
+                            GetTimeAgo getTimeAgo = new GetTimeAgo();
+                            holder.setNoteTime(getTimeAgo.getTimeAgo(Long.parseLong(timestamp), getApplicationContext()));
 
-                        holder.noteCard.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent intent = new Intent(NotesMine.this, NewNoteActivity.class);
-                                intent.putExtra("noteId", noteId);
-                                startActivity(intent);
-                            }
-                        });
+                            holder.noteCard.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(NotesMine.this, NewNoteActivity.class);
+                                    intent.putExtra("noteId", noteId);
+                                    startActivity(intent);
+                                }
+                            });
+                        }
+
+
                     }
 
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                    }
 
-                }
+                });
 
-            });
+            }
 
-        }
-
-    };
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        adapter.stopListening();
+        };
+        mNotesList.setAdapter(adapter);
     }
 
 
-   /* private void updateUI() {
+
+    private void updateUI() {
         if (fAuth.getCurrentUser() != null){
             Log.i("MainActivity", "fAuth != null");
         } else {
@@ -143,7 +144,7 @@ public class NotesMine extends AppCompatActivity {
             Log.i("MainActivity", "fAuth == null");
         }
 
-    }*/
+    }
 
 
     @Override
@@ -171,9 +172,8 @@ public class NotesMine extends AppCompatActivity {
 
 
 
-    /**
-     * Converting dp to pixel
-     */
+
+
     private int dpToPx(int dp) {
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
